@@ -1275,42 +1275,83 @@ details.advanced .advanced__body { padding: 0 16px 16px; }
   .pulse-card { flex-basis: 300px; }
 }
 
-/* 移动端筛选：抽屉 */
+/* --------------------------------------------------------------------------
+   10.1 筛选面板
+   基础态：移动端隐藏、桌面端作为常驻侧栏（见 @media 900px 的 display: block）
+   移动端展开：仅有 .is-open 时渲染成底部抽屉（带可点击关闭的遮罩）
+   -------------------------------------------------------------------------- */
 .filter-aside { display: none; }
-.filter-aside.is-open {
-  display: block;
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  background: rgba(15, 23, 42, .45);
-  padding: 0;
-}
+.filter-aside__scrim { display: none; }
+
 .filter-sheet {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  max-height: 84vh;
-  overflow-y: auto;
   background: var(--card);
-  border-radius: var(--r-panel) var(--r-panel) 0 0;
   padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px));
-  animation: sheetUp var(--t-page) both;
 }
+
+/* 桌面端不需要“关闭”按钮：改为内联关闭，避免与顶部空白冲突 */
+.filter-sheet .filter-close { display: none; }
+
+@media (max-width: 899px) {
+  /* 遮罩只覆盖视口，抽屉贴底；点击遮罩即可关闭 */
+  .filter-aside {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: block;
+    background: transparent;
+    pointer-events: none;
+  }
+  .filter-aside .filter-aside__scrim {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: rgba(15, 23, 42, .45);
+    opacity: 0;
+    transition: opacity var(--t-base);
+    pointer-events: none;
+  }
+  .filter-aside.is-open { pointer-events: auto; }
+  .filter-aside.is-open .filter-aside__scrim { opacity: 1; pointer-events: auto; }
+
+  .filter-aside .filter-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 84vh;
+    overflow-y: auto;
+    border-radius: var(--r-panel) var(--r-panel) 0 0;
+    box-shadow: 0 -8px 32px rgba(15, 23, 42, .18);
+    transform: translateY(100%);
+    transition: transform var(--t-page);
+    pointer-events: none;
+  }
+  .filter-aside.is-open .filter-sheet {
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* 抽屉打开时锁定背景滚动 */
+  body.filter-open { overflow: hidden; }
+
+  .filter-sheet__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: sticky;
+    top: -16px;
+    background: var(--card);
+    padding: 8px 0;
+    margin-bottom: 4px;
+    z-index: 2;
+  }
+  .filter-sheet__head h3 { font-size: 16px; }
+}
+
 @keyframes sheetUp {
   from { transform: translateY(24px); opacity: .6; }
   to { transform: none; opacity: 1; }
 }
-.filter-sheet__head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: sticky;
-  top: -16px;
-  background: var(--card);
-  padding: 8px 0;
-  margin-bottom: 4px;
-  z-index: 2;
-}
-.filter-sheet__head h3 { font-size: 16px; }
 
 /* --------------------------------------------------------------------------
    11. 打印 / 降低动效

@@ -14,9 +14,6 @@
 
   var CATEGORY_ORDER = ['讲座', '竞赛', '招募', '志愿', '学习小组', '约球', '资料', '补充通知', '搭子', '交流', '其他'];
 
-  /** 页面滚动位置保留（避免 tick 重渲染后回到顶部） */
-  var lastScroll = 0;
-
   function greeting() {
     var h = new Date().getHours();
     if (h < 6) return '夜深了';
@@ -226,9 +223,11 @@
 
     /* —— 布局：筛选 + 结果 —— */
     html += '<div class="discover-layout" style="margin-top:24px">';
-    html += '<aside class="discover-aside' + (prefs.__open ? ' is-open' : '') + '" id="filterAside"' +
-      ' aria-label="筛选面板">' + filterPanel(pool, prefs) + '</aside>';
-
+    // 筛选面板：移动端为底部抽屉（点遮罩或 ✕ 关闭），桌面端为常驻侧栏
+    html += '<div class="filter-aside' + (prefs.__open ? ' is-open' : '') + '">' +
+      '<div class="filter-aside__scrim" data-action="closeFilters" aria-hidden="true"></div>' +
+      filterPanel(pool, prefs) +
+      '</div>';
     html += '<div class="discover-results">';
 
     /* 截止雷达 */
@@ -284,9 +283,6 @@
     html += '</section></div></div></div>';
 
     root.innerHTML = html;
-
-    // 恢复滚动位置（例如 tick 触发的重渲染）
-    if (lastScroll > 0) window.scrollTo(0, lastScroll);
   }
 
   /** 风险信息折叠区：默认收起，并明确标注 */
@@ -333,9 +329,7 @@
     },
     resetFilters: function () {
       S.resetPreferences();
-    },
-    saveScroll: function () { lastScroll = window.scrollY; },
-    clearScroll: function () { lastScroll = 0; }
+    }
   };
 
   CR.views = CR.views || {};

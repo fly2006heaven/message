@@ -13,7 +13,6 @@
   var R = CR.router;
 
   var mainEl = null;
-  var lastRouteName = null;
   var firedReminders = {};   // 本次会话内已提示过的提醒
   var searchTimer = null;
   var ticking = false;
@@ -21,6 +20,7 @@
   /* ------------------------------------------------------------ 工具 ---- */
   function nav(hash) { R.navigate(hash); }
 
+  /** 整页重渲染（keepScroll=true 时不改变滚动位置） */
   function reRender(keepScroll) {
     renderRoute(R.current() || R.parse(global.location.hash), keepScroll);
   }
@@ -357,17 +357,20 @@
       case 'openFilters':
         e.preventDefault();
         S.state.preferences.__open = true;
+        syncFilterOpenState();
         reRender(true);
         break;
       case 'closeFilters':
         e.preventDefault();
         S.state.preferences.__open = false;
+        syncFilterOpenState();
         reRender(true);
         break;
       case 'resetFilters':
         e.preventDefault();
         S.resetPreferences();
         S.state.preferences.__open = false;
+        syncFilterOpenState();
         CR.toast.info('已重置搜索与筛选条件');
         reRender(true);
         break;
@@ -583,7 +586,26 @@
   }
 
   function onKeydown(e) {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') {
+      closeModal();
+      // 移动端筛选抽屉：Esc 关闭
+      if (S.state.preferences.__open) {
+        S.state.preferences.__open = false;
+        syncFilterOpenState();
+        reRender(true);
+      }
+    }
+  }
+
+  /**
+   * 筛选抽屉打开时锁定背景滚动，避免抽屉背后的页面跟着滚动。
+   * 桌面端不使用 is-open，因此不会锁定。
+   */
+  function syncFilterOpenState() {
+    var open = !!(S.state.preferences && S.state.preferences.__open);
+    if (document.body && document.body.classList) {
+      document.body.classList.toggle('filter-open', open);
+    }
   }
 
   /* ---------------------------------------------------- 倒计时与提醒 ---- */
@@ -658,7 +680,8 @@
   function renderRoute(route, keepScroll) {
     if (!mainEl) return;
     clearModal();
-    if (route.name !== lastRouteName) CR.views.discover.clearScroll();
+    // 筛选抽屉只属于发现页：切到其他页面时必须收起，否则残留的滚动锁定会让页面无法滚动
+    if (route.name !== 'discover') S.state.preferences.__open = false;
 
     var view = CR.views[route.name];
     if (!view) {
@@ -685,6 +708,7 @@
     }
 
     setActiveNav(route.name);
+    syncFilterOpenState();
     if (!keepScroll) window.scrollTo(0, 0);
     tick();
   }
@@ -715,6 +739,7 @@
 
       R.onChange(function (route) { renderRoute(route, false); });
       var route = R.start();
+      syncFilterOpenState();
 
       // 顶部“新生护航模式”快捷开关
       var toggle = document.getElementById('guardToggle');

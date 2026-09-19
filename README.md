@@ -205,7 +205,7 @@ campus-radar/
 │   ├── store.js                状态中心、筛选、排序、全部用户操作
 │   ├── router.js               Hash 路由
 │   └── app.js                  入口：事件委托、倒计时 tick、提醒、渲染分发
-└── tests/                      Node 自检套件（226 项断言，无需浏览器）
+└── tests/                      Node 自检套件（256 项断言，无需浏览器）
 ```
 
 **加载顺序即依赖顺序**（`index.html` 中的 `<script>` 顺序）：`utils → storage → seed → store → components → views → router → app`。
@@ -474,7 +474,7 @@ score = 新生友好度 × 0.42 + 截止紧急度 × 0.38 + 时间就近度 × 0
 
 ## 自检与测试
 
-`tests/` 下是 5 个 Node 自检套件，用轻量 DOM 桩直接加载**真实源码**，无需浏览器、无需依赖：
+`tests/` 下是 6 个 Node 自检套件，用轻量 DOM 桩直接加载**真实源码**，无需浏览器、无需依赖：
 
 ```bash
 node tests/run-all.js
@@ -486,13 +486,15 @@ node tests/run-all.js
 | `flowtest.js` | 52 | 引导 → 发现 → 筛选 → 收藏/报名/提醒/日历 → 冲突 → 发布 → 编辑/下架 → 刷新持久化 |
 | `apptest.js` | 39 | 真实 `app.js` 事件委托、路由渲染、弹窗、Toast、导航高亮、倒计时 tick |
 | `structuretest.js` | 43 | 标签闭合、id 唯一、无 `undefined` 残留、`data-action` / `data-field` 契约、无障碍属性、关键内容抽查 |
+| `filtertest.js` | 30 | 直接解析 `styles.css` 的**层叠与媒体查询归属**，断言筛选面板在桌面/移动端都不会遮挡页面；并验证遮罩关闭、滚动锁定与路由切换自动收起 |
 | `clocktest.js` | 7 | 系统时间远离基准日（模拟 2027 年）时仍可运行，今日焦点自动回退且不空白 |
 
-**合计 226 项断言，全部通过。**
+**合计 256 项断言，全部通过。**
 
 自检过程中定位并修复的真实缺陷包括：Hash 路由 `:id` 参数解析失败（`String.replace` 替换串中 `$&` 被当作特殊模式）、
 发布草稿被双层包裹导致「刷新后继续填写」失效、发布页 `ReferenceError` 导致整页白屏、
-引导页兴趣选择被重复渲染清空、部分种子字段在构造时被丢弃、IndexedDB 不可用时重复初始化丢失内存中的发布。
+引导页兴趣选择被重复渲染清空、部分种子字段在构造时被丢弃、IndexedDB 不可用时重复初始化丢失内存中的发布、
+以及筛选面板的全屏遮罩规则写在媒体查询之外导致桌面端整页被遮住。
 
 ---
 
@@ -567,7 +569,7 @@ node tests/run-all.js
 - **新增页面**：在 `js/views/` 下新建模块并挂载到 `CR.views.<name>`，
   提供 `render(root, params)`，然后在 `js/router.js` 的 `ROUTES` 与 `index.html` 的脚本列表中登记。
 - **新增样式**：优先复用 `css/styles.css` 顶部的设计令牌，避免硬编码色值与间距。
-- **提交前自检**：运行 `node tests/run-all.js`，确保 226 项断言全部通过。
+- **提交前自检**：运行 `node tests/run-all.js`，确保 256 项断言全部通过。
 - **不要提交**：`node_modules/`、编辑器与系统产生的临时文件（已在 `.gitignore` 中排除）。
 
 ---
