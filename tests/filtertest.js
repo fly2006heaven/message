@@ -129,6 +129,50 @@ check('存在 body.filter-open 滚动锁定规则',
 check('桌面端隐藏抽屉关闭按钮',
   rulesFor('.filter-sheet .filter-close').some((r) => !r.media && /display:\s*none/.test(r.body)));
 
+/* ------------------------------------------------------------------
+   「新生引导」重点标注：两套导航各自的样式不能互相泄漏
+   ------------------------------------------------------------------ */
+const NAV_HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+
+/* 桌面强调胶囊只能是全局规则（它位于 .nav-desktop 内部，移动端不显示） */
+const navEmphRules = rulesFor('.nav-emph');
+check('存在桌面强调胶囊 .nav-emph 样式', navEmphRules.length > 0);
+check('.nav-emph 不被限制在移动端媒体查询内',
+  navEmphRules.every((r) => !isMobileMedia(r.media)),
+  navEmphRules.map((r) => r.media || 'GLOBAL').join(' | '));
+check('.nav-emph 具备强调视觉（渐变/强调色 + 阴影）',
+  navEmphRules.some((r) => /linear-gradient/.test(r.body) && /box-shadow/.test(r.body)),
+  navEmphRules.map((r) => r.body.trim().replace(/\s+/g, ' ').slice(0, 70)).join(' | '));
+
+/* 强调不能只靠颜色：必须有图标与文字标签 */
+check('强调胶囊含图标', NAV_HTML.indexOf('class="nav-emph"') >= 0 &&
+  /nav-emph[\s\S]{0,320}<svg/.test(NAV_HTML));
+check('强调胶囊含文字标签（新手）',
+  NAV_HTML.indexOf('class="nav-badge">新手<') >= 0);
+check('强调胶囊保留完整链接文字（新生引导）',
+  NAV_HTML.indexOf('class="nav-emph__label">新生引导<') >= 0);
+
+/* 桌面强调样式不得泄漏到移动底栏：底栏用 .tab-emph */
+const mobileOnly = ['.tab-emph', '.tab-emph__icon'];
+mobileOnly.forEach((sel) => {
+  const hit = rulesFor(sel);
+  check(sel + ' 只在移动端生效（桌面隐藏底栏，故为全局即可）', hit.length > 0, hit.length);
+});
+check('移动端「新生」有圆形强调底与角标',
+  rulesFor('.tab-emph__icon').some((r) => /linear-gradient/.test(r.body)) &&
+  rulesFor('.tab-emph__dot').length > 0);
+
+/* 角标脉冲必须尊重 prefers-reduced-motion */
+const rm = css.match(/@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\n\}/);
+check('存在 prefers-reduced-motion 规则', !!rm);
+check('降低动效时动画被强制压缩', !!rm && /animation-duration:\s*1ms\s*!important/.test(rm[1]),
+  rm ? rm[1].trim().split('\n')[1] : 'n/a');
+
+/* 窄桌面下压缩内边距，避免顶栏溢出 */
+check('存在窄桌面（900—1099px）的导航压缩规则',
+  rules.some((r) => /min-width:\s*900px/.test(r.media || '') &&
+    /max-width:\s*1099px/.test(r.media || '') && r.selector === '.nav-desktop a'));
+
 /* ------------------------------------------------- 2. 运行时 DOM 契约 -- */
 const files = ['js/utils/date.js','js/utils/trust.js','js/utils/conflict.js','js/storage.js','js/data/seed.js','js/store.js','js/components/badge.js','js/components/toast.js','js/components/card.js','js/views/discover.js','js/views/detail.js','js/views/calendar.js','js/views/publish.js','js/views/mine.js','js/views/onboarding.js','js/router.js'];
 class El {
