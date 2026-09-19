@@ -116,8 +116,7 @@ function render(label, fn) {
   check('日历图例含文字说明', /报名截止/.test(calHtml) && /学生自发/.test(calHtml));
 
   /* ---------- 5. 关键内容抽查 ---------- */
-  check('发现页含 26 条（含本机发布计数）', /共 26 条机会/.test(discoverHtml), (discoverHtml.match(/共 \d+ 条机会/) || [])[0]);
-  check('截止雷达含 9月24日 22:00', /9月24日 22:00/.test(discoverHtml));
+  check('发现页含 26 条（含本机发布计数）', /共 26 条机会/.test(discoverHtml), (discoverHtml.match(/共 \d+ 条机会/) || [])[0]);  check('截止雷达含 9月24日 22:00', /9月24日 22:00/.test(discoverHtml));
   check('截止雷达含 10月5日 23:59', /10月5日 23:59/.test(discoverHtml));
   check('补充通知在发现页独立成卡', /程序设计训练营补充通知/.test(discoverHtml));
   const d01 = (() => { const r = new El('div'); CR.views.detail.render(r, { id: '01' }); return r.innerHTML; })();
@@ -128,6 +127,26 @@ function render(label, fn) {
   check('详情 19 候补说明', /如现场仍有余位，可接受候补入场/.test(d19));
   const d8 = (() => { const r = new El('div'); CR.views.detail.render(r, { id: '08' }); return r.innerHTML; })();
   check('详情 08 显示长期开放', /长期开放/.test(d8));
+
+  /* ---------- 6. 品牌名一致性（改名后防止漏改或再次漂移） ---------- */
+  const brand = CR.store.BRAND;
+  check('BRAND 常量已导出', !!(brand && brand.name && brand.full), JSON.stringify(brand));
+  const indexSrc = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  check('index.html 标题使用品牌全名',
+    indexSrc.indexOf('<title>' + brand.full + '</title>') >= 0,
+    (indexSrc.match(/<title>([^<]*)<\/title>/) || [])[1]);
+  check('index.html 顶栏品牌名与 BRAND 一致',
+    indexSrc.indexOf('class="brand__name">' + brand.name + '<') >= 0);
+  check('index.html aria-label 使用品牌名',
+    indexSrc.indexOf('aria-label="' + brand.name + ' 首页"') >= 0);
+  const detailHtml = (() => { const r = new El('div'); CR.views.detail.render(r, { id: '01' }); return r.innerHTML; })();
+  const plain = CR.views.detail.plainText(CR.seed.byId('01'));
+  check('复制信息文本含品牌全名', plain.indexOf(brand.full) >= 0, brand.full);
+  // 代码里不应再出现脱离 BRAND 常量的裸品牌名（`校园机会雷达` 前面没有 `珠科`）
+  const strayFiles = ['js/app.js', 'js/views/discover.js', 'js/views/detail.js', 'js/store.js']
+    .filter((f) => /(?<!珠科)校园机会雷达/.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
+  check('代码中无脱离 BRAND 的硬编码品牌名', strayFiles.length === 0, strayFiles.join(','));
+  check('发现页问候语使用品牌名', discoverHtml.indexOf('欢迎使用' + brand.name) >= 0);
 
   let failed = 0;
   results.forEach((r) => { if (!r.ok) failed++; console.log((r.ok ? 'PASS ' : 'FAIL ') + r.n + (r.e ? '   [' + r.e + ']' : '')); });

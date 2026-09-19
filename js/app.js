@@ -651,7 +651,7 @@
         CR.toast.bell(text + '（' + CR.date.fmtDateShort(r.at) + ' ' + CR.date.fmtTime(r.at) + '）', 6000);
         try {
           if (global.Notification && global.Notification.permission === 'granted') {
-            new global.Notification('校园机会雷达 · 提醒', { body: text });
+            new global.Notification(S.BRAND.name + ' · 提醒', { body: text });
           }
         } catch (e) { /* 忽略 */ }
       }
@@ -717,7 +717,7 @@
   function boot() {
     mainEl = document.getElementById('main');
 
-    mainEl.innerHTML = '<div class="view">' + U.loading('校园机会雷达启动中…') + '</div>';
+    mainEl.innerHTML = '<div class="view">' + U.loading(S.BRAND.name + '启动中…') + '</div>';
 
     S.init().then(function () {
       // 首次访问自动进入新生引导
@@ -774,7 +774,7 @@
         setTimeout(function () { CR.toast.warn(n, 5000); }, 400 + i * 600);
       });
 
-      console.info('%c校园机会雷达 CampusRadar', 'color:#2563EB;font-weight:700',
+      console.info('%c' + S.BRAND.full, 'color:#2563EB;font-weight:700',
         '\n种子版本：' + CR.seed.SEED_VERSION + '（基准 ' + CR.seed.BASE_LABEL + '）' +
         '\n路由：' + R.ROUTES.map(function (r) { return r.pattern; }).join('  ') +
         '\n持久化：localStorage(' + CR.storage.KEYS.userState + ') + IndexedDB(' + CR.storage.STORES.join('/') + ')');

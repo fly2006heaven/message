@@ -8,6 +8,9 @@ const results = [];
 const check = (n, c, e) => results.push({ n, ok: !!c, e: e === undefined ? '' : String(e) });
 const countLines = (file) => fs.readFileSync(file, 'utf8').split('\n').length;
 
+/* 本文件自身的断言数量（写死以免自引用递归）；新增断言时同步加一 */
+const SELF_ASSERTIONS = 19;
+
 /* 1. 代码块配对 */
 const fences = (md.match(/^```/gm) || []).length;
 check('代码块围栏成对出现', fences % 2 === 0, fences + ' 个 ```');
@@ -111,20 +114,44 @@ check('徽章链接格式合法', badges.every((b) => /\)$/.test(b) && b.include
   badges.length + ' 个');
 
 /* 9. 断言总数与套件清单保持一致
-   注意：readmetest 自身的断言数会随本文件变化，改这里时同步更新 README */
-const suiteTotals = {
-  'selftest.js': 85, 'flowtest.js': 52, 'apptest.js': 39, 'structuretest.js': 43,
-  'clocktest.js': 7, 'filtertest.js': 30, 'readmetest.js': 17
-};
-const trueTotal = Object.keys(suiteTotals).reduce((s, k) => s + suiteTotals[k], 0);
-check('README 声明的断言总数与各套件之和一致',
-  md.includes(trueTotal.toLocaleString('en-US') + ' 项断言'), '应为 ' + trueTotal);
-
+   直接运行每个套件并解析其自报的断言数，避免手写数字过期（readmetest 自身除外） */
+const { spawnSync } = require('child_process');
 const suiteFiles = fs.readdirSync(path.join(ROOT, 'tests'))
   .filter((f) => f.endsWith('.js') && f !== 'run-all.js');
 check('README 列出的套件数量与实际文件一致', suiteFiles.length === 7, suiteFiles.length);
 const notListed = suiteFiles.filter((f) => !md.includes('`' + f + '`'));
 check('README 中列出了每一个测试套件', notListed.length === 0, notListed.join(','));
+
+const measured = {};
+suiteFiles.filter((f) => f !== 'readmetest.js').forEach((f) => {
+  const res = spawnSync(process.execPath, [path.join(ROOT, 'tests', f)], {
+    cwd: ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024
+  });
+  const m = String(res.stdout || '').match(/共\s*(\d+)\s*项/);
+  measured[f] = m ? Number(m[1]) : null;
+});
+
+const badSuites = Object.keys(measured).filter((f) => measured[f] == null);
+check('每个套件都能自报断言数', badSuites.length === 0, badSuites.join(','));
+
+/* README 表格中每个套件的断言数都应等于其实测值 */
+const mismatch = [];
+Object.keys(measured).forEach((f) => {
+  if (measured[f] == null) return;
+  const re = new RegExp('`' + f.replace('.', '\\.') + '`\\s*\\|\\s*(\\d+)\\s*\\|');
+  const hit = md.match(re);
+  if (!hit) { mismatch.push(f + ': 表格中未找到'); return; }
+  if (Number(hit[1]) !== measured[f]) mismatch.push(f + ': README ' + hit[1] + ' vs 实测 ' + measured[f]);
+});
+check('README 表格中各套件断言数与实测一致', mismatch.length === 0, mismatch.join(' | '));
+
+/* 声明总数 = 各套件实测值之和（含 readmetest 自身运行时的数量） */
+const selfMatch = fs.readFileSync(__filename, 'utf8');
+const selfCount = Number((selfMatch.match(/const SELF_ASSERTIONS = (\d+)/) || [])[1] || 0);
+const measuredTotal = Object.keys(measured).reduce((s, k) => s + (measured[k] || 0), 0) + selfCount;
+check('README 声明的断言总数与实测之和一致',
+  md.includes(measuredTotal.toLocaleString('en-US') + ' 项断言'),
+  '实测合计 ' + measuredTotal);
 
 let failed = 0;
 results.forEach((r) => { if (!r.ok) failed++; console.log((r.ok ? 'PASS ' : 'FAIL ') + r.n + (r.e ? '   [' + r.e + ']' : '')); });

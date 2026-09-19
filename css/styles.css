@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CampusRadar 校园机会雷达 — 全局样式
+   CampusRadar 珠科校园机会雷达 — 全局样式
    原生 CSS，无外部依赖。移动优先，桌面最大容器 1200px。
    ========================================================================== */
 
@@ -157,6 +157,7 @@ small, .t-small { font-size: 13px; line-height: 20px; }
   gap: 12px;
 }
 
+/* 品牌名可随视口收缩：允许截断而非把右侧工具栏挤出屏幕 */
 .brand {
   display: flex;
   align-items: center;
@@ -165,6 +166,7 @@ small, .t-small { font-size: 13px; line-height: 20px; }
   padding: 0 4px;
   border-radius: var(--r-btn);
   color: var(--text);
+  min-width: 0;
 }
 .brand__mark {
   width: 34px; height: 34px;
@@ -177,9 +179,21 @@ small, .t-small { font-size: 13px; line-height: 20px; }
   box-shadow: var(--sh-1);
 }
 .brand__mark svg { width: 20px; height: 20px; }
-.brand__text { display: flex; flex-direction: column; line-height: 1.15; }
-.brand__name { font-size: 16px; font-weight: 700; letter-spacing: .2px; }
-.brand__sub { font-size: 11px; color: var(--text-3); letter-spacing: .5px; }
+.brand__text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.brand__name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand__sub {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
 
 .nav-desktop { display: none; margin-left: auto; align-items: center; gap: 4px; }
 .nav-desktop a {
@@ -1244,6 +1258,7 @@ details.advanced .advanced__body { padding: 0 16px 16px; }
   .toast-host { bottom: 24px; }
 
   .view { padding: 24px; }
+  .brand__name { font-size: 16px; }
   .hero { padding: 28px 24px 20px; }
   .hero__title { font-size: 28px; line-height: 36px; }
   .pulse-strip { padding-left: 24px; padding-right: 24px; }

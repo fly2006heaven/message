@@ -9,6 +9,13 @@
   var CR = (global.CampusRadar = global.CampusRadar || {});
   var storage = CR.storage;
 
+  /** 产品名统一出口：改这一处即可全局生效（界面 / 复制文本 / 通知 / 文档） */
+  var BRAND = {
+    name: '珠科校园机会雷达',
+    en: 'CampusRadar',
+    full: '珠科校园机会雷达 CampusRadar'
+  };
+
   var state = {
     ready: false,
     user: CR.defaults.userState(),
@@ -713,6 +720,7 @@
 
   var store = {
     state: state,
+    BRAND: BRAND,
     SIGNUP_STATUS: SIGNUP_STATUS,
     REMINDER_OFFSETS: REMINDER_OFFSETS,
     CONDITIONS: CONDITIONS,

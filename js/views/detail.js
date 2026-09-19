@@ -276,7 +276,7 @@
     if (op.needReview) lines.push('注意：提交报名表不代表最终录取，以审核通知为准。');
     if (op.riskLevel === 'high') lines.push('风险提示：' + CR.trust.riskOf(op).text);
     if (op.riskLevel === 'suspect') lines.push('提示：' + CR.trust.riskOf(op).text);
-    lines.push('（来自 校园机会雷达 CampusRadar · 数据版本 ' + CR.seed.SEED_VERSION + '）');
+    lines.push('（来自 ' + S.BRAND.full + ' · 数据版本 ' + CR.seed.SEED_VERSION + '）');
     return lines.join('\n');
   }
 

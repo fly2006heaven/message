@@ -173,7 +173,7 @@
     html += '<header class="hero"><div class="hero__inner">' +
       '<span class="hero__date">' + U.icon('calendar') +
         ' 2026年9月19日，周六 · 数据版本 ' + U.esc(CR.seed.SEED_VERSION) + '</span>' +
-      '<h1 class="hero__title">' + greeting() + '，欢迎使用校园机会雷达' +
+      '<h1 class="hero__title">' + greeting() + '，欢迎使用' + U.esc(S.BRAND.name) +
         (guardOn ? '<span class="badge badge--open" style="margin-left:8px">' + U.icon('shield') + '新生护航已开启</span>' : '') +
       '</h1>' +
       '<p class="hero__sub">帮你看懂来源、对象、截止、是否需要审核，以及哪些信息有风险。</p>' +
