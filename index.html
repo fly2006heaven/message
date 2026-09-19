@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563EB" />
+  <meta name="description" content="校园机会雷达 CampusRadar — 帮在校学生（尤其新生）看懂并参加校园活动、竞赛、招募、志愿与资料。" />
+  <title>校园机会雷达 CampusRadar</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <!-- 顶部：品牌 + 桌面导航 -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="#/discover" aria-label="校园机会雷达 首页">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <path d="M12 12 20 6"></path>
+          </svg>
+        </span>
+        <span class="brand__text">
+          <span class="brand__name">校园机会雷达</span>
+          <span class="brand__sub">CampusRadar</span>
+        </span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="主导航">
+        <a data-nav href="#/discover">发现</a>
+        <a data-nav href="#/calendar">日历</a>
+        <a data-nav href="#/publish">发布</a>
+        <a data-nav href="#/mine">我的</a>
+        <a data-nav href="#/onboarding">新生引导</a>
+      </nav>
+
+      <div class="header-tools">
+        <button class="icon-btn" id="guardToggle" type="button"
+                aria-pressed="false" title="新生护航模式">
+          <span class="sr-only">切换新生护航模式</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体视图挂载点 -->
+  <main class="app-main" id="main" tabindex="-1"></main>
+
+  <!-- 移动端底部 Tab -->
+  <nav class="tabbar" aria-label="底部导航">
+    <a data-nav href="#/discover">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 12l8-6"></path>
+      </svg>
+      <span>发现</span>
+    </a>
+    <a data-nav href="#/calendar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="5" width="18" height="16" rx="3"></rect>
+        <path d="M8 3v4M16 3v4M3 11h18"></path>
+      </svg>
+      <span>日历</span>
+    </a>
+    <a data-nav href="#/publish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      <span>发布</span>
+    </a>
+    <a data-nav href="#/mine">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.6"></circle>
+        <path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path>
+      </svg>
+      <span>我的</span>
+    </a>
+    <a data-nav href="#/onboarding">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3l2.3 5.3 5.7.5-4.3 3.8 1.3 5.6L12 15.6 6.9 18.2 8.2 12.6 4 8.8l5.7-.5z"></path>
+      </svg>
+      <span>新生</span>
+    </a>
+  </nav>
+
+  <!-- 全局 Toast 容器 -->
+  <div class="toast-host" id="toastHost" role="status" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- 无构建工具：按依赖顺序加载普通脚本（双击 index.html 即可运行） -->
+  <script src="js/utils/date.js"></script>
+  <script src="js/utils/trust.js"></script>
+  <script src="js/utils/conflict.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/data/seed.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/components/badge.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/card.js"></script>
+  <script src="js/views/discover.js"></script>
+  <script src="js/views/detail.js"></script>
+  <script src="js/views/calendar.js"></script>
+  <script src="js/views/publish.js"></script>
+  <script src="js/views/mine.js"></script>
+  <script src="js/views/onboarding.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

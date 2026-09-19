@@ -1,0 +1,46 @@
+# ---------- 依赖与构建产物（本项目零依赖，此处为防御性忽略） ----------
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# ---------- 编辑器与 IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- 操作系统 ----------
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ---------- 日志与临时文件 ----------
+*.log
+npm-debug.log*
+yarn-error.log*
+*.tmp
+*.bak
+_*.js
+_dbg*/
+_profile_tmp/
+_p1/
+_p2/
+_p3/
+.pytest_cache/
+__pycache__/
+
+# ---------- 本地环境变量与密钥（切勿提交） ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+
+# ---------- 浏览器本地数据导出备份 ----------
+campusradar-backup*.json
